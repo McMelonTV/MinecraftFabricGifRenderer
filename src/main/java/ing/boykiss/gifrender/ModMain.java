@@ -1,12 +1,12 @@
 package ing.boykiss.gifrender;
 
 import com.madgag.gif.fmsware.GifDecoder;
+import com.mojang.blaze3d.systems.RenderSystem;
 import ing.boykiss.gifrender.mixin.AccessorNativeImage;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.*;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.math.MatrixStack;
@@ -109,20 +109,21 @@ public class ModMain implements ClientModInitializer {
             }
 
             Identifier i = textures.get(frame);
-
-            int light = 15728880;
-
-            VertexConsumer vertexConsumer = context.getVertexConsumers().getBuffer(RenderLayer.getGuiOverlay());
             MinecraftClient.getInstance().getTextureManager().bindTexture(i);
-            MatrixStack matrices = context.getMatrices();
-            Matrix4f matrix4f = matrices.peek().getPositionMatrix();
 
-            vertexConsumer.vertex(matrix4f, 0.0F, 498.0F, -0.01F).color(255, 255, 255, 255).texture(0.0F, 1.0F).light(light);
-            vertexConsumer.vertex(matrix4f, 498.0F, 498.0F, -0.01F).color(255, 255, 255, 255).texture(1.0F, 1.0F).light(light);
-            vertexConsumer.vertex(matrix4f, 498.0F, 0.0F, -0.01F).color(255, 255, 255, 255).texture(1.0F, 0.0F).light(light);
-            vertexConsumer.vertex(matrix4f, 0.0F, 0.0F, -0.01F).color(255, 255, 255, 255).texture(0.0F, 0.0F).light(light);
+            Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 
-            context.draw();
+            BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+            bufferBuilder.vertex(matrix, 0, 0, 0).texture(0, 0);
+            bufferBuilder.vertex(matrix, 0, 498, 0).texture(0, 1);
+            bufferBuilder.vertex(matrix, 498, 498, 0).texture(1, 1);
+            bufferBuilder.vertex(matrix, 498, 0, 0).texture(1, 0);
+
+            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+            RenderSystem.setShaderTexture(0, i);
+
+            BuiltBuffer buffer = bufferBuilder.end();
+            BufferRenderer.drawWithGlobalProgram(buffer);
         });
     }
 }
