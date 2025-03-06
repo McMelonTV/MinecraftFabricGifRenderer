@@ -15,9 +15,10 @@ public class ModMain implements ClientModInitializer {
     public void onInitializeClient() {
         AtomicReference<Optional<GifDrawable>> gifDrawable = new AtomicReference<>(Optional.empty());
 
+        //have to do this because ResourceManager is not available until the client is started
         ClientLifecycleEvents.CLIENT_STARTED.register((client) -> {
             if (gifDrawable.get().isEmpty()) {
-                gifDrawable.set(Optional.of(new GifDrawable(Identifier.of("gifrender:textures/gif.gif"), 0, 0, 30, 50)));
+                gifDrawable.set(Optional.of(new GifDrawable(Identifier.of("gifrender:textures/gif.gif"), 0, 0, 60, 10)));
             }
         });
 
