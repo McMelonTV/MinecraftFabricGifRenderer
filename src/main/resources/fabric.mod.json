@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "gifrender",
+  "version": "${version}",
+  "name": "gifrender",
+  "description": "Thing",
+  "authors": [],
+  "contact": {},
+  "license": "AGPL-3.0",
+  "icon": "assets/gifrender/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "ing.boykiss.gifrender.ModMain"
+    ]
+  },
+  "mixins": [
+    "gifrender.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
