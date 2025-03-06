@@ -99,7 +99,6 @@ public class ModMain implements ClientModInitializer {
 
             int frameCount = decoder.getFrameCount();
             int frame = (int) (System.currentTimeMillis() / 100) % frameCount;
-            System.out.println("frame = " + frame + " frameCount = " + frameCount);
 
             if (!textures.containsKey(frame)) {
                 BufferedImage image = decoder.getFrame(frame);
