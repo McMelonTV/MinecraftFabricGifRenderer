@@ -2,6 +2,7 @@ package ing.boykiss.gifrender.gui;
 
 import com.madgag.gif.fmsware.GifDecoder;
 import com.mojang.blaze3d.systems.RenderSystem;
+import ing.boykiss.gifrender.ModMain;
 import ing.boykiss.gifrender.mixin.AccessorNativeImage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -31,7 +32,10 @@ public class GifDrawable implements Drawable {
     private final int height;
     private final int frameCount;
     private final GifDecoder gifDecoder = new GifDecoder();
+    private int lastFrame = 0;
+    private long lastFrameTime = 0;
     private final HashMap<Integer, Identifier> frameTextures = new HashMap<>();
+    private final HashMap<Integer, Integer> frameDurations = new HashMap<>();
 
     public GifDrawable(Identifier gif, int x, int y, int width, int height) {
         this.x = x;
@@ -55,6 +59,10 @@ public class GifDrawable implements Drawable {
             throw new RuntimeException(e);
         }
         frameCount = gifDecoder.getFrameCount();
+
+        for (int i = 0; i < frameCount; i++) {
+            frameDurations.put(i, gifDecoder.getDelay(i));
+        }
     }
 
     // yoinked from https://github.com/0x3C50/Renderer/blob/master/src/main/java/me/x150/renderer/util/RendererUtils.java#L166
@@ -99,7 +107,15 @@ public class GifDrawable implements Drawable {
     }
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        int frame = (int) (System.currentTimeMillis() / 100) % frameCount;
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastFrameTime > frameDurations.get(lastFrame)) {
+            lastFrameTime = currentTime;
+            lastFrame++;
+            if (lastFrame >= frameCount) {
+                lastFrame = 0;
+            }
+        }
+        int frame = lastFrame;
 
         if (!frameTextures.containsKey(frame)) {
             BufferedImage image = gifDecoder.getFrame(frame);
