@@ -9,7 +9,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -84,7 +83,7 @@ public class ModMain implements ClientModInitializer {
                 rm = client.getResourceManager();
             }
             if (rm != null && !init) {
-                optionalResource = rm.getResource(Identifier.of("gifrender", "textures/gui/test.gif"));
+                optionalResource = rm.getResource(Identifier.of("gifrender", "textures/gif.gif"));
                 resource = optionalResource.orElse(null);
                 if (resource == null) {
                     return;
@@ -112,11 +111,16 @@ public class ModMain implements ClientModInitializer {
 
             Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 
+            int x = 0;
+            int y = 0;
+            int width = 100;
+            int height = 100;
+
             BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-            bufferBuilder.vertex(matrix, 0, 0, 0).texture(0, 0);
-            bufferBuilder.vertex(matrix, 0, 498, 0).texture(0, 1);
-            bufferBuilder.vertex(matrix, 498, 498, 0).texture(1, 1);
-            bufferBuilder.vertex(matrix, 498, 0, 0).texture(1, 0);
+            bufferBuilder.vertex(matrix, x, y + height, 0).texture(0, 1);
+            bufferBuilder.vertex(matrix, x + width, y + height, 0).texture(1, 1);
+            bufferBuilder.vertex(matrix, x + width, y, 0).texture(1, 0);
+            bufferBuilder.vertex(matrix, x, y, 0).texture(0, 0);
 
             RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             RenderSystem.setShaderTexture(0, i);
